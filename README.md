@@ -2,6 +2,8 @@
 
 A coding-agent skill for creating stunning HTML presentations — from scratch or by converting PowerPoint files. It is packaged as a Claude Code plugin, and the core `SKILL.md` can also be read by other coding agents with filesystem and shell access.
 
+This fork also bundles a second skill, **[Presenter Tools](#presenter-tools)** — a drop-in laser pointer, inline editor, and move/resize layer for the decks you make.
+
 ## 📺 Watch the Walkthrough & Tutorial
 
 New here? This beginner-friendly video walks you through the whole thing, start to finish.
@@ -28,6 +30,7 @@ https://github.com/user-attachments/assets/ef57333e-f879-432a-afb9-180388982478
 - **Anti-AI-Slop** — Curated distinctive styles that avoid generic AI aesthetics (bye-bye, purple gradients on white).
 - **Bold Template Pack** — Optional design-forward templates from `beautiful-html-templates`, loaded progressively so safe presets still work as the default fallback.
 - **Production Quality** — Accessible, fixed 16:9, well-commented code you can customize.
+- **Presenter Tools** — A second bundled skill adds a laser pointer, live text editing, drag-to-move/resize, a 16:9 lock, and save-in-place to any finished deck.
 
 ## Installation
 
@@ -36,8 +39,10 @@ https://github.com/user-attachments/assets/ef57333e-f879-432a-afb9-180388982478
 Install directly from this public GitHub repo. Run these as two separate Claude Code messages; do not paste both lines into the prompt at once.
 
 ```text
-/plugin marketplace add https://github.com/zarazhangrui/frontend-slides
+/plugin marketplace add https://github.com/millecodex/nerd-slides
 ```
+
+(That's this fork, which includes the Presenter Tools skill. Use `https://github.com/zarazhangrui/frontend-slides` for the upstream original without it.)
 
 After that finishes, run:
 
@@ -128,6 +133,33 @@ The skill will:
 2. Show you the extracted content for confirmation
 3. Let you pick a visual style
 4. Generate an HTML presentation with all your original assets
+
+## Presenter Tools
+
+This fork ships a second skill in the same plugin: **Presenter Tools**, a zero-dependency vanilla JS/CSS layer that makes a finished, self-contained HTML deck editable and presentable right in the browser. Once your deck exists, invoke it with:
+
+```text
+/frontend-slides:presenter-tools
+
+> "Add the presenter tools to my-deck.html"
+```
+
+Plain-language requests work too: "make my deck editable", "add a laser pointer", "lock the slides to 16:9". The skill injects the tools directly into the deck's HTML — no build step, nothing for the audience machine to install.
+
+It adds a hover toolbar (top-left) plus keyboard shortcuts:
+
+| Tool      | Key        | What it does                                                                                                                              |
+| --------- | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| **Laser** | `L`        | Cursor becomes a glowing red dot for pointing.                                                                                            |
+| **Text**  | `E`        | Click-to-edit any text box, with a floating rich-text bar: bold/italic/underline, font size, alignment, font family, text colour, and five highlight colours. |
+| **Move**  | `G`        | Click a box to select it, drag to reposition, drag the handles to resize, or delete it entirely. Works on images and inline SVG too.       |
+| **16:9**  | `R`        | Locks the stage to a letterboxed 16:9 slide, with a fill-window toggle (uses the optional `stage-16x9.css`).                              |
+| **Reset** | —          | Clears all moves, resizes, and deletions (keeps text edits).                                                                              |
+| **Save**  | `⌘/Ctrl+S` | Saves the deck with all edits baked in and the tool UI stripped out — save-in-place where the browser allows it, download otherwise.       |
+
+Edits, positions, and highlights persist in `localStorage` (keyed per file), so they survive reloads. The toolbars pick up your deck's `--paper` / `--ink` CSS variables so they match its theme.
+
+If you installed manually rather than via the plugin, the skill lives at `plugins/frontend-slides/skills/presenter-tools/` — copy it to `~/.claude/skills/presenter-tools/` and invoke it as `/presenter-tools`.
 
 ## Included Styles
 
@@ -587,7 +619,7 @@ Uses [Playwright](https://playwright.dev) to screenshot each slide at 1920×1080
 
 ## Credits
 
-Created by [@zarazhangrui](https://github.com/zarazhangrui).
+Created by [@zarazhangrui](https://github.com/zarazhangrui). Presenter Tools skill added in this fork by [@millecodex](https://github.com/millecodex).
 
 ## License
 
