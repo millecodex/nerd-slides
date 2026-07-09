@@ -1,0 +1,25 @@
+/* =====================================================================
+   Optional: lock the deck to a 16:9 stage (letterboxed), with a
+   toggle back to fill-window. Requires two things:
+
+   1) Structure:   <div class="deck"><div class="stage"> ...slides... </div></div>
+   2) Sizing unit: author your slide sizing in CONTAINER units (cqw/cqh)
+      instead of viewport units (vw/vh). Because the .stage below is a
+      `container-type: size`, cqw/cqh resolve against the STAGE, so every
+      proportion is preserved in both 16:9 and fill modes.
+      (Tip: on an existing vw/vh deck, replace `NNvw`->`NNcqw`,
+       `NNvh`->`NNcqh`, but keep the four .stage values below as vw/vh.)
+
+   The Presenter Tools "16:9" button toggles body.fill-mode.
+   ===================================================================== */
+html, body { margin:0; height:100%; background:#0a0a0a; }         /* letterbox colour */
+.deck  { position:fixed; inset:0; display:grid; place-items:center; }
+.stage {
+  position: relative;
+  overflow: hidden;
+  background: var(--paper, #F0EBDE);
+  container-type: size;
+  width:  min(100vw, 177.78vh);   /* 16:9 by default */
+  height: min(100vh, 56.25vw);
+}
+body.fill-mode .stage { width: 100vw; height: 100vh; }            /* toggled by the 16:9/Fill button */

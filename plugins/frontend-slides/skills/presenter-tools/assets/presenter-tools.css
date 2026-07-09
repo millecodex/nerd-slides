@@ -1,0 +1,51 @@
+/* =====================================================================
+   Presenter Tools — styles
+   Laser · Text edit + rich-text bar · Move + resize · 16:9 · Reset · Save
+   Theme-agnostic: uses --paper / --ink if your deck defines them,
+   otherwise falls back to cream/cobalt. Override those two vars to reskin.
+   ===================================================================== */
+
+/* Toolbar — top-left, reveals on hover */
+#tools-hotzone { position:fixed; top:0; left:0; width:280px; height:60px; z-index:100000; }
+#tools-bar { position:fixed; top:14px; left:14px; z-index:100001; display:flex; gap:8px; opacity:0; pointer-events:none; transition:opacity .25s ease; }
+#tools-bar.show { opacity:1; pointer-events:auto; }
+#tools-bar button { font-family:ui-monospace,'DM Mono',monospace; font-size:12px; letter-spacing:.02em; background:var(--paper,#F0EBDE); color:var(--ink,#1F2BE0); border:1.5px solid var(--ink,#1F2BE0); padding:7px 11px; cursor:pointer; }
+#tools-bar button.active { background:var(--ink,#1F2BE0); color:var(--paper,#F0EBDE); }
+
+/* Laser dot */
+#laserDot { position:fixed; top:0; left:0; width:22px; height:22px; margin:-11px 0 0 -11px; border-radius:50%; background:radial-gradient(circle, rgba(255,60,40,1) 0%, rgba(229,57,42,.85) 35%, rgba(229,57,42,0) 70%); box-shadow:0 0 14px 6px rgba(229,57,42,.55); pointer-events:none; z-index:99999; display:none; }
+
+/* Edit-mode outlines */
+body.tools-edit [contenteditable="true"] { outline:1.5px dashed rgba(31,43,224,.5); outline-offset:3px; }
+body.tools-edit [contenteditable="true"]:focus { outline:1.5px solid #E5392A; }
+
+/* Move-mode hover outline (marks the exact box you'll grab) */
+body.tools-arrange .zk-hover { outline:1.5px dashed rgba(229,57,42,.85); outline-offset:2px; cursor:grab; }
+
+/* Toast */
+.tools-toast { position:fixed; bottom:16px; left:50%; transform:translateX(-50%); z-index:99999; background:var(--ink,#1F2BE0); color:var(--paper,#F0EBDE); font-family:ui-monospace,'DM Mono',monospace; font-size:13px; letter-spacing:.03em; padding:8px 14px; opacity:0; pointer-events:none; transition:opacity .3s ease; }
+.tools-toast.show { opacity:1; }
+
+/* Rich-text formatting bar (floats above the box you're editing) */
+#rt-bar { position:fixed; z-index:100002; display:none; gap:2px; align-items:center; background:var(--ink,#1F2BE0); border:1.5px solid var(--ink,#1F2BE0); padding:4px; border-radius:7px; box-shadow:0 6px 18px rgba(0,0,0,.20); }
+#rt-bar.show { display:flex; }
+#rt-bar button { font-family:ui-monospace,'DM Mono',monospace; font-size:13px; min-width:28px; height:28px; line-height:1; background:var(--paper,#F0EBDE); color:var(--ink,#1F2BE0); border:none; border-radius:4px; cursor:pointer; padding:0 6px; }
+#rt-bar button:hover { background:#fff; }
+#rt-bar .sep { width:1px; height:20px; background:rgba(240,235,222,.45); margin:0 3px; }
+#rt-bar .sw { font-weight:800; }
+#rt-bar .hl-sw { min-width:22px; width:22px; height:22px; padding:0; border:1px solid rgba(31,43,224,.25); border-radius:4px; }  /* colour set inline per swatch */
+#rt-bar .ft { min-width:30px; font-size:14px; }  /* font-family buttons (serif / sans / mono) */
+
+/* Move-mode selection frame + 8 resize handles */
+#zk-select { position:fixed; z-index:99990; border:1.5px solid #E5392A; pointer-events:none; display:none; }
+#zk-select.show { display:block; }
+#zk-select .h { position:absolute; width:12px; height:12px; background:#fff; border:1.5px solid #E5392A; border-radius:2px; pointer-events:auto; }
+#zk-select .h.nw { left:-6px; top:-6px; cursor:nwse-resize; }
+#zk-select .h.n  { left:calc(50% - 6px); top:-6px; cursor:ns-resize; }
+#zk-select .h.ne { right:-6px; top:-6px; cursor:nesw-resize; }
+#zk-select .h.e  { right:-6px; top:calc(50% - 6px); cursor:ew-resize; }
+#zk-select .h.se { right:-6px; bottom:-6px; cursor:nwse-resize; }
+#zk-select .h.s  { left:calc(50% - 6px); bottom:-6px; cursor:ns-resize; }
+#zk-select .h.sw { left:-6px; bottom:-6px; cursor:nesw-resize; }
+#zk-select .h.w  { left:-6px; top:calc(50% - 6px); cursor:ew-resize; }
+#zk-select .zk-del { position:absolute; top:-30px; right:-6px; width:22px; height:22px; line-height:21px; text-align:center; background:#E5392A; color:#fff; border-radius:50%; font-size:12px; cursor:pointer; pointer-events:auto; }
