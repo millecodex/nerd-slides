@@ -148,14 +148,17 @@ Plain-language requests work too: "make my deck editable", "add a laser pointer"
 
 It adds a hover toolbar (top-left) plus keyboard shortcuts:
 
-| Tool      | Key        | What it does                                                                                                                              |
-| --------- | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| **Laser** | `L`        | Cursor becomes a glowing red dot for pointing.                                                                                            |
-| **Text**  | `E`        | Click-to-edit any text box, with a floating rich-text bar: bold/italic/underline, font size, alignment, font family, text colour, and five highlight colours. |
-| **Move**  | `G`        | Click a box to select it, drag to reposition, drag the handles to resize, or delete it entirely. Works on images and inline SVG too.       |
-| **16:9**  | `R`        | Locks the stage to a letterboxed 16:9 slide, with a fill-window toggle (uses the optional `stage-16x9.css`).                              |
-| **Reset** | —          | Clears all moves, resizes, and deletions (keeps text edits).                                                                              |
-| **Save**  | `⌘/Ctrl+S` | Saves the deck with all edits baked in and the tool UI stripped out — save-in-place where the browser allows it, download otherwise.       |
+| Tool        | Key        | What it does                                                                                                                              |
+| ----------- | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| **Laser**   | `L`        | Cursor becomes a glowing red dot for pointing.                                                                                            |
+| **Text**    | `E`        | Click-to-edit any text box, with a floating rich-text bar: bold/italic/underline, font size, alignment, font family, text colour, and five highlight colours. |
+| **Move**    | `G`        | Click a box to select it, drag to reposition, drag the handles to resize, or delete it entirely. Works on images and inline SVG too.       |
+| **Snap**    | —          | Snap-to-grid while dragging (on by default), with red alignment guides when a box lines up with another box's edges or centre. Hold `Alt` to bypass. |
+| **+ / − Slide** | —      | Duplicates the current slide (immediately editable) or deletes it, with confirmation.                                                     |
+| **16:9**    | `R`        | Locks the stage to a letterboxed 16:9 slide, with a fill-window toggle (uses the optional `stage-16x9.css`).                              |
+| **Reset**   | —          | Clears all moves, resizes, and deletions (keeps text edits).                                                                              |
+| **Save**    | `⌘/Ctrl+S` | Saves the deck with all edits baked in and the tool UI stripped out — save-in-place where the browser allows it, download otherwise. The saved copy always reopens at the first slide. |
+| **⤓ PDF**   | `⌘/Ctrl+P` | Exports the deck to PDF via the print dialog — one 16:9 landscape page per slide, backgrounds preserved, tool UI hidden.                  |
 
 Edits, positions, and highlights persist in `localStorage` (keyed per file), so they survive reloads. The toolbars pick up your deck's `--paper` / `--ink` CSS variables so they match its theme.
 
