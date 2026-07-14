@@ -4,11 +4,15 @@ description: >-
   Add live presenter/authoring tools to a self-contained HTML slide deck: a
   laser pointer, inline text editing with a rich-text formatting bar
   (bold/italic/underline, size, alignment, colour, highlight), drag-to-move and
-  drag-to-resize of any box, a 16:9 aspect-ratio lock (with fill-window toggle),
-  a reset button, and Save-to-file that bakes edits in. Use when a user asks to
-  make an HTML/reveal-style presentation editable, add a laser pointer, let them
-  move/resize slide elements, highlight text while presenting, lock the deck to
-  16:9, or "add the presenter tools / editing overlay" to a deck.
+  drag-to-resize of any box with snap-to-grid and alignment guides, duplicate /
+  delete slide controls, a 16:9 aspect-ratio lock (with fill-window toggle),
+  a reset button, one-click PDF export (one slide per 16:9 landscape page), and
+  Save-to-file that bakes edits in and reopens the deck at the first slide. Use when
+  a user asks to make an HTML/reveal-style presentation editable, add a laser
+  pointer, let them move/resize slide elements, snap boxes to a grid so they line
+  up, add / duplicate / delete slides, highlight text while presenting, lock the
+  deck to 16:9, export a deck to PDF / print slides one-per-page, make a deck
+  reopen at the front, or "add the presenter tools / editing overlay" to a deck.
 ---
 
 # Presenter Tools
@@ -26,13 +30,27 @@ A hover toolbar (top-left) plus keyboard shortcuts:
 | **Laser** | `L` | Cursor becomes a glowing red dot for pointing. |
 | **Text** | `E` | Every text box becomes click-to-edit. A floating **rich-text bar** appears above the focused box: **B / I / U**, font **A− / A+**, align left/center/right, three **font-family** buttons (serif / sans / mono — pulled from the deck's own fonts), text-colour swatches, and **five highlight colours** (rose, amber, mint, sky, lilac) plus a clear button. |
 | **Move** | `G` | Click a box to select it (red frame + 8 handles). Drag the body to reposition; drag a handle to resize (edge handles keep the opposite edge anchored). Hover shows the exact box you'll grab. A red **✕** on the frame (or **Delete / Backspace**) removes the selected box. |
+| **Snap** | — | Toggles snap-to-grid while dragging (**on by default**). A dragged box snaps its edges/centres to the deck's grid *and* to other boxes — when it lines up with another box's left/centre/right or top/middle/bottom a red **guide line** appears. Hold **Alt** while dragging to bypass snapping for fine nudges. |
+| **+ Slide** | — | Duplicates the current slide (deep clone) and inserts it right after, then navigates to it. New elements register cleanly so they're immediately editable/movable without disturbing existing saved edits. |
+| **− Slide** | — | Deletes the current slide (after a confirm). Won't delete the last remaining slide. |
 | **16:9** | `R` | Toggles the stage between a locked 16:9 slide (letterboxed) and fill-window. **Always starts at 16:9** on load; Fill is an in-session toggle. Requires `stage-16x9.css` (see below). |
 | **Reset** | — | Clears all moves / resizes / deletions and reloads original positions (keeps text edits). |
 | **Save** | `⌘/Ctrl+S` | Saves the deck with all edits/format/highlights/positions baked in and every tool's UI stripped out. Prefers **save-in-place** (File System Access API): the first save asks you to pick the file (choose the deck to overwrite it), later saves overwrite it in one click. Falls back to a **download** where the browser blocks that (e.g. some `file://` setups). |
+| **⤓ PDF** | `⌘/Ctrl+P` | Exports the deck to PDF via the print dialog — **one slide per 16:9 landscape page**, backgrounds preserved, all tool UI hidden. The button just calls `window.print()`; the bundled `@media print` block does the layout. |
 
 Move and Text are mutually exclusive so a click never does both. Text edits,
-positions, sizes, deletions and highlights persist in `localStorage` (namespaced
-per file path) and survive reloads.
+positions, sizes, deletions, highlights and the snap on/off state persist in
+`localStorage` (namespaced per file path) and survive reloads. **Save** also
+normalises the deck to reopen at the **first slide** (only slide 0 keeps `.active`
+in the saved copy), so it never reopens on whatever slide you left it on.
+
+**Slide add/delete integration.** If your deck exposes a controller on
+`window.deck` with `show(i)`, `renumber()`, `list()` and a `current` index, the
++ Slide / − Slide buttons drive it directly. Otherwise they fall back to toggling
+the `.active` class and renumbering any `.pagenum` box that reads `NN / MM`.
+Because new slides are appended to the internal element list (not inserted
+mid-array), duplicating a slide never shifts the indices that saved edits are
+keyed to — the failure mode you get from hand-inserting a `<section>` mid-deck.
 
 > **Two-source caveat.** Live tool changes live in the browser (DOM + localStorage);
 > if you *also* hand-edit the file, keep one as the source of truth at a time.
@@ -57,13 +75,18 @@ per file path) and survive reloads.
      window.PRESENTER_TOOLS_CONFIG = {
        slide: '.slide',                 // your slide element selector
        editable: 'h1,h2,h3,p,li,.caption,.title',  // which elements are editable/movable
-       saveName: 'my-deck.html'         // download filename for Save
+       saveName: 'my-deck.html',        // download filename for Save
+       snap: true,                      // snap-to-grid + alignment guides (default on)
+       gridSize: 40                     // fallback grid step in px (see note below)
      };
    </script>
    ```
    Defaults target common text tags (`h1..h5,p,li,blockquote,figcaption`) plus a
    set of common classes, scoped to `.slide`. Images and inline SVG inside slides
-   are movable/resizable too.
+   are movable/resizable too. **Snap** reads the actual grid size from a
+   `.stage::before` background-grid if one exists (so it snaps to the *visible*
+   graph-paper lines); otherwise it uses `gridSize`. Alignment-to-other-boxes
+   snapping works regardless of whether the deck draws a grid.
 
 ## Theming
 
@@ -92,6 +115,32 @@ Converting an existing `vw`/`vh` deck: replace numeric `NNvw`→`NNcqw` and
 `stage-16x9.css`) as `vw`/`vh` since they must reference the real viewport. The
 "16:9 / Fill" button toggles `body.fill-mode`. If you skip this file, the button
 is harmless (it just toggles a class nothing listens to).
+
+## PDF export
+
+A **⤓ PDF** button in the toolbar (and the browser's native **⌘/Ctrl+P**) opens the
+print dialog to save the deck as a PDF. A bundled `@media print` block in
+`presenter-tools.css` turns each slide into its own 16:9 landscape page:
+
+- moves the container-query context from `.stage` onto each `.slide` (sized
+  `1280×720`) so `cqw`/`cqh` content scales correctly instead of collapsing;
+- forces `print-color-adjust: exact` so cream/coloured backgrounds actually print;
+- hides every tool overlay (`#tools-bar`, laser, guides, selection frame, toasts).
+
+In the dialog choose **Save as PDF**, **Landscape**, **Margins: None**, and tick
+**Background graphics**. The rules target the `.deck > .stage > .slide` structure
+from `stage-16x9.css`; if your slide class or stage wrapper differs, adjust the
+selectors (and the `@page { size: 1280px 720px }`) to match. To stop at a subset
+(e.g. omit an appendix), add `.slide.appendix { display:none !important; }` inside
+the `@media print` block.
+
+## Opens at the first slide
+
+Decks that persist the active slide (or bake it on Save) annoyingly reopen on the
+last-viewed slide. **Save** prevents this: on serialize it strips `.active` from
+every slide except the first, so the saved file always reopens at the front. For a
+flash-free start, pair it with a deck nav that calls `show(0)` (or sets its index
+to `0`) on load instead of adopting the `.active` from markup.
 
 ## Notes & limits
 

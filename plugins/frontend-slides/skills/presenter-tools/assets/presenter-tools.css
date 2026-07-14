@@ -49,3 +49,37 @@ body.tools-arrange .zk-hover { outline:1.5px dashed rgba(229,57,42,.85); outline
 #zk-select .h.sw { left:-6px; bottom:-6px; cursor:nesw-resize; }
 #zk-select .h.w  { left:-6px; top:calc(50% - 6px); cursor:ew-resize; }
 #zk-select .zk-del { position:absolute; top:-30px; right:-6px; width:22px; height:22px; line-height:21px; text-align:center; background:#E5392A; color:#fff; border-radius:50%; font-size:12px; cursor:pointer; pointer-events:auto; }
+
+/* Snap-to-grid alignment guides (shown while dragging in Move mode) */
+#snap-v { position:fixed; top:0; bottom:0; width:1px; background:#E5392A; z-index:100000; pointer-events:none; display:none; }
+#snap-h { position:fixed; left:0; right:0; height:1px; background:#E5392A; z-index:100000; pointer-events:none; display:none; }
+
+
+/* ============================================================
+   PDF EXPORT  (paired with the #tb-pdf toolbar button + window.print())
+   Turns each slide into its own 16:9 landscape page. Assumes the
+   .deck > .stage > .slide structure from stage-16x9.css; adjust the
+   selectors if your deck differs.
+   ============================================================ */
+@media print {
+  @page { size: 1280px 720px; margin: 0; }
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  html, body { width:auto !important; height:auto !important; margin:0 !important;
+               overflow:visible !important; background:#fff !important; }
+  /* hide every tool overlay */
+  #tools-bar, #tools-hotzone, #laserDot, #rt-bar, #snap-h, #snap-v, #zk-select,
+  .tools-toast { display:none !important; }
+  /* unwrap the fixed, centred stage */
+  .deck  { position:static !important; display:block !important; inset:auto !important; place-items:initial !important; }
+  .stage { position:static !important; display:block !important; container-type:normal !important;
+           width:auto !important; height:auto !important; overflow:visible !important; }
+  .stage::before { display:none !important; }
+  /* each slide = its own page AND its own container-query context */
+  .slide {
+    position:relative !important; inset:auto !important; opacity:1 !important;
+    display:block !important; width:1280px !important; height:720px !important;
+    container-type:size !important; overflow:hidden !important;
+    break-after:page; page-break-after:always; break-inside:avoid; transition:none !important;
+  }
+  .slide:last-child { break-after:auto; page-break-after:auto; }
+}
